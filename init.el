@@ -131,3 +131,26 @@ by Prelude.")
  (run-at-time 5 nil 'prelude-tip-of-the-day))
 
 ;;; init.el ends here
+
+(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+
+(require 'ocp-indent)
+(require 'merlin)
+
+;;;;;;;;;;; monky
+
+(add-to-list 'load-path "monky")
+(require 'monky)
+
+;; By default monky spawns a seperate hg process for every command.
+;; This will be slow if the repo contains lot of changes.
+;; if `monky-process-type' is set to cmdserver then monky will spawn a single
+;; cmdserver and communicate over pipe.
+;; Available only on mercurial versions 1.9 or higher
+
+(setq monky-process-type 'cmdserver)
+
+
+
+;;;;;;;;;;; end monky
