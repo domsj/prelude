@@ -135,13 +135,16 @@ by Prelude.")
 (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
 (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
+(add-to-list 'load-path "%{share}%/emacs/site-lisp")
 (require 'ocp-indent)
-(require 'merlin)
+
+
+;(require 'merlin)
 
 ;;;;;;;;;;; monky
 
-(add-to-list 'load-path "monky")
-(require 'monky)
+;(add-to-list 'load-path "monky")
+;(require 'monky)
 
 ;; By default monky spawns a seperate hg process for every command.
 ;; This will be slow if the repo contains lot of changes.
@@ -149,8 +152,33 @@ by Prelude.")
 ;; cmdserver and communicate over pipe.
 ;; Available only on mercurial versions 1.9 or higher
 
-(setq monky-process-type 'cmdserver)
+;(setq monky-process-type 'cmdserver)
 
 
 
 ;;;;;;;;;;; end monky
+
+
+(defvar my-packages '(
+                      exec-path-from-shell))
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-refresh-contents)
+    (package-install p)))
+
+
+(setq load-path (cons "~/.emacs.d/ahg" load-path))
+(require 'ahg)
+
+(when window-system
+  (exec-path-from-shell-initialize))
+
+(setenv "CAML_LD_LIBRARY_PATH" "/home/jan/.opam/4.02.0/lib/stublibs")
+(setenv "PERL5LIB" "/home/jan/.opam/4.02.0/lib/perl5:")
+(setenv "OCAML_TOPLEVEL_PATH" "/home/jan/.opam/4.02.0/lib/toplevel")
+(setenv "MANPATH" ":/home/jan/.opam/4.02.0/man")
+(setenv "PATH" "/home/jan/.opam/4.02.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games")
+
+(setq exec-path (split-string (getenv "PATH") ":"))
+
+(whitespace-mode)
