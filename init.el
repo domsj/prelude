@@ -135,8 +135,8 @@ by Prelude.")
 (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
 (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
-(add-to-list 'load-path "%{share}%/emacs/site-lisp")
-(require 'ocp-indent)
+;; (add-to-list 'load-path "%{share}%/emacs/site-lisp")
+;; (require 'ocp-indent)
 
 
 ;(require 'merlin)
@@ -160,7 +160,8 @@ by Prelude.")
 
 
 (defvar my-packages '(
-                      exec-path-from-shell))
+                      exec-path-from-shell
+                      helm))
 (dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-refresh-contents)
@@ -170,15 +171,51 @@ by Prelude.")
 (setq load-path (cons "~/.emacs.d/ahg" load-path))
 (require 'ahg)
 
-(when window-system
-  (exec-path-from-shell-initialize))
+;; (when window-system
+;;   (exec-path-from-shell-initialize))
 
-(setenv "CAML_LD_LIBRARY_PATH" "/home/jan/.opam/4.02.0/lib/stublibs")
-(setenv "PERL5LIB" "/home/jan/.opam/4.02.0/lib/perl5:")
-(setenv "OCAML_TOPLEVEL_PATH" "/home/jan/.opam/4.02.0/lib/toplevel")
-(setenv "MANPATH" ":/home/jan/.opam/4.02.0/man")
-(setenv "PATH" "/home/jan/.opam/4.02.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games")
+(setenv "CAML_LD_LIBRARY_PATH" "/home/jan/.opam/4.02.1/lib/stublibs")
+(setenv "PERL5LIB" "/home/jan/.opam/4.02.1/lib/perl5:")
+(setenv "OCAML_TOPLEVEL_PATH" "/home/jan/.opam/4.02.1/lib/toplevel")
+(setenv "MANPATH" ":/home/jan/.opam/4.02.1/man")
+(setenv "PATH" "/home/jan/.opam/4.02.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games")
 
 (setq exec-path (split-string (getenv "PATH") ":"))
 
-(whitespace-mode)
+(whitespace-mode 1)
+
+;;; helm
+
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "M-x") 'helm-M-x)
+
+;;;;;;;;;;;;;;;;; utop integration
+
+;; Setup environment variables using opam
+(dolist (var (car (read-from-string (shell-command-to-string "opam config env --sexp"))))
+  (setenv (car var) (cadr var)))
+
+;; Update the emacs path
+(setq exec-path (append (parse-colon-path (getenv "PATH"))
+                        (list exec-directory)))
+
+;; Update the emacs load path
+(add-to-list 'load-path (expand-file-name "../../share/emacs/site-lisp"
+                                          (getenv "OCAML_TOPLEVEL_PATH")))
+
+;; Automatically load utop.el
+(autoload 'utop "utop" "Toplevel for OCaml" t)
+
+(autoload 'utop-setup-ocaml-buffer "utop" "Toplevel for OCaml" t)
+(add-hook 'tuareg-mode-hook 'utop-setup-ocaml-buffer)
+(add-hook 'typerex-mode-hook 'utop-setup-ocaml-buffer)
+
+
+;;;;;;;;;;;;;;; merlin
+
+(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+
+(require 'ocp-indent)
+(require 'merlin)
