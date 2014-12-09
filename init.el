@@ -132,8 +132,8 @@ by Prelude.")
 
 ;;; init.el ends here
 
-(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
-(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+;(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+;(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
 ;; (add-to-list 'load-path "%{share}%/emacs/site-lisp")
 ;; (require 'ocp-indent)
@@ -178,7 +178,11 @@ by Prelude.")
 (setenv "PERL5LIB" "/home/jan/.opam/4.02.1/lib/perl5:")
 (setenv "OCAML_TOPLEVEL_PATH" "/home/jan/.opam/4.02.1/lib/toplevel")
 (setenv "MANPATH" ":/home/jan/.opam/4.02.1/man")
-(setenv "PATH" "/home/jan/.opam/4.02.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games")
+(setenv "PATH" "/home/jan/.opam/4.02.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/jan/bin")
+
+
+(setenv "ALBA_WORKSPACE" "/home/jan/dev")
+(setenv "LD_LIBRARY_PATH" "/home/jan/dev/kinetic-cpp-client/:/home/jan/dev/kinetic-cpp-client/vendor/lib/:/home/jan/dev/alba/cpp/lib")
 
 (setq exec-path (split-string (getenv "PATH") ":"))
 
@@ -189,6 +193,8 @@ by Prelude.")
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 (global-set-key (kbd "M-x") 'helm-M-x)
+
+(global-set-key (kbd "C-x C-c") 'helm-M-x)
 
 ;;;;;;;;;;;;;;;;; utop integration
 
