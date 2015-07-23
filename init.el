@@ -218,6 +218,9 @@ by Prelude.")
 (add-hook 'typerex-mode-hook 'utop-setup-ocaml-buffer)
 
 
+(add-to-list 'load-path "/home/jan/.opam/4.02.1/share/emacs/site-lisp")
+(require 'ocp-indent)
+
 ;;;;;;;;;;;;;;; merlin
 
 (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
@@ -225,3 +228,35 @@ by Prelude.")
 
 (require 'ocp-indent)
 (require 'merlin)
+
+(add-hook 'c-mode-common-hook (function (lambda () (local-set-key (kbd "TAB") 'clang-format-region))))
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+
+
+(setq compilation-filenames '("Makefile" "makefile"))
+
+(defun get-nearest-compilation-file ()
+  "Search for the compilation file traversing up the directory tree."
+  (let ((dir default-directory)
+        (parent-dir (file-name-directory (directory-file-name default-directory)))
+        (nearest-compilation-file 'nil))
+    (while (and (not (string= dir parent-dir))
+                (not nearest-compilation-file))
+      (dolist (filename compilation-filenames)
+        (setq file-path (concat dir filename))
+        (when (file-readable-p file-path)
+          (setq nearest-compilation-file file-path)))
+      (setq dir parent-dir
+            parent-dir (file-name-directory (directory-file-name parent-dir))))
+    nearest-compilation-file))
+
+;; bind compiling with get-nearest-compilation-file to f5
+(global-set-key [f5]
+                (lambda () (interactive)
+                  (compile (format
+                            "cd %s && make"
+                            (file-name-directory (get-nearest-compilation-file)))
+                           )
+                  ))
